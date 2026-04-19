@@ -1,79 +1,114 @@
-# Skies Weather — Local Setup Guide
+# Skies Weather
 
-## Your folder should look like this:
+A beautiful personal weather app — works on Mac, iPhone, and any browser. Built with vanilla HTML/JS, powered by free APIs, deployable to Vercel with zero cost.
+
+---
+
+## Features
+
+- 🌤 Current conditions with animated background scenes (clear, rain, snow, thunder, fog, night)
+- 🌡 Both °C and °F always visible — tap to switch primary display
+- 📍 Default city: Charleston, IL — add and save unlimited cities
+- 📅 10-day forecast with temperature range bars
+- 🕐 24-hour hourly scroll with precipitation probability
+- 🌅 Sunrise & sunset with day progress indicator
+- 🌬 Air quality index (AQI) via Open-Meteo
+- 🌙 Moon phase calculated locally
+- ⚠️ Live weather alerts via NWS (US only, free)
+- 🛰 Rain radar map via Windy embed
+- 📤 Share weather summary (native share sheet or clipboard copy)
+- 🔔 Rain alert push notifications (browser-based, checks every 15 min)
+- 🔄 Manual refresh button
+- 🌙/☀️ Dark and light mode, persists across sessions
+- Works offline after first load (service worker caching)
+
+---
+
+## APIs Used (all free, no key required)
+
+| API | Used for |
+|-----|----------|
+| [Open-Meteo](https://open-meteo.com) | Weather forecast, hourly, daily, AQI |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | City search |
+| [Nominatim (OSM)](https://nominatim.org) | Reverse geocoding for GPS location |
+| [NWS (api.weather.gov)](https://www.weather.gov/documentation/services-web-api) | US weather alerts |
+| [Windy](https://embed.windy.com) | Rain radar embed |
+
+---
+
+## File Structure
+
 ```
 skies/
-├── index.html
-├── manifest.json
-├── sw.js
-├── icon-192.png      ← generate this (see below)
-├── icon-512.png      ← generate this (see below)
+├── index.html       ← entire app (HTML + CSS + JS)
+├── manifest.json    ← PWA manifest
+├── sw.js            ← service worker (offline + push)
+├── icon-192.png     ← app icon (generate below)
+├── icon-512.png     ← app icon large (generate below)
 └── README.md
 ```
 
 ---
 
-## Step 1 — Create a folder
-Make a folder called `skies` anywhere (Desktop is fine).
-Drop all the files into it.
+## Setup
 
----
-
-## Step 2 — Create app icons (free, 2 minutes)
+### Step 1 — Create icons (2 min)
 
 Go to https://favicon.io/favicon-generator/
-- Text: ☀️  (or just "Sk")
-- Background: Rounded, color #1a2744
-- Font color: #ffffff
-- Download the zip → grab `android-chrome-192x192.png` and `android-chrome-512x512.png`
-- Rename them to `icon-192.png` and `icon-512.png`
-- Put them in your skies/ folder
+- Text: `Sk` · Background: Rounded · Color: `#0a0a0f` · Font color: `#ffffff`
+- Download → rename `android-chrome-192x192.png` → `icon-192.png` and `android-chrome-512x512.png` → `icon-512.png`
+- Drop both into your project folder
 
----
+### Step 2 — Local development
 
-## Step 3 — Install VS Code + Live Server
+1. Install [VS Code](https://code.visualstudio.com) + the **Live Server** extension (by Ritwick Dey)
+2. Open your project folder in VS Code
+3. Right-click `index.html` → **Open with Live Server**
+4. Opens at `http://127.0.0.1:5500/index.html`
 
-1. Download VS Code: https://code.visualstudio.com
-2. Open VS Code → Extensions (⇧⌘X) → search "Live Server" → Install
-   (by Ritwick Dey, 50M+ downloads)
+**Install as Mac app:** Chrome will show an install ⊕ icon in the address bar → click to install as a standalone app
 
----
+### Step 3 — Deploy to Vercel (free, HTTPS, works everywhere)
 
-## Step 4 — Run it on your Mac
+1. Push your folder to a GitHub repo
+2. Go to [vercel.com](https://vercel.com) → Import project → connect your repo
+3. Click Deploy — you get a URL like `https://skies-weather.vercel.app`
 
-1. Open VS Code
-2. File → Open Folder → select your `skies/` folder
-3. Right-click `index.html` → "Open with Live Server"
-4. Chrome opens at `http://127.0.0.1:5500/index.html`
+Any push to GitHub auto-redeploys in ~30 seconds.
 
-**Install as a Mac app (Chrome):**
-- In Chrome, look for the install icon (⊕) in the address bar → Install "Skies Weather"
-- It appears in your Applications folder and Dock like a real app
+### Step 4 — iPhone home screen
 
----
-
-## Step 5 — Use it on your iPhone (same WiFi)
-
-1. With Live Server running on your Mac, find your Mac's local IP:
-   - System Settings → Wi-Fi → click your network → note the IP (e.g. 192.168.1.42)
-2. On your iPhone, open Safari and go to:
-   `http://192.168.1.42:5500/index.html`
-3. Tap the Share button → **Add to Home Screen** → Add
-4. It installs as a full-screen app on your home screen ✓
+1. Open your Vercel URL in **Safari**
+2. Tap **Share → Add to Home Screen**
+3. Full-screen app, no browser bar, works offline ✓
 
 ---
 
 ## Making edits
 
-1. Open `index.html` in VS Code
-2. Edit and save (⌘S)
-3. The browser auto-refreshes instantly — no manual reload needed
+Edit `index.html` locally → save → Live Server auto-refreshes. When happy, push to GitHub and Vercel deploys automatically.
+
+---
+
+## Push notifications
+
+The app checks for rain every 15 minutes using the browser's Notification API. To enable:
+- Tap **Rain Alerts** in the Quick Actions card
+- Allow notifications when prompted
+- You'll get a notification if rain probability exceeds 60% in the next 3 hours for your default city (Charleston, IL)
+- Works in Chrome on desktop; Safari on iOS 16.4+ when installed as a home screen app
+
+---
+
+## Weather alerts
+
+US weather alerts (NWS) load automatically for US cities. No setup needed — alerts appear as colored banners at the top of the screen when active. Colors indicate severity: red = extreme, orange = severe, yellow = moderate, blue = minor.
 
 ---
 
 ## Tips
 
-- Weather data caches for 10 minutes so it loads fast on repeat opens
-- Your saved cities and unit preference (°C/°F) persist in localStorage
-- The app works offline after first load (service worker caches the shell)
-- To force a weather refresh, just pull-to-reload in the browser
+- Weather data caches for 10 minutes — tap Refresh to force a fresh fetch
+- City list and preferences (unit, dark/light mode) persist in localStorage
+- The app works fully offline after first load
+- On iOS, notifications only work when the app is installed to the home screen (Add to Home Screen)

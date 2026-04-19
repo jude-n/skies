@@ -53,7 +53,7 @@
   --pill-ab: rgba(13,26,46,0.25);
   --nav: rgba(235,240,250,0.82);
   --nav-b: rgba(13,26,46,0.1);
-  --ov: rgba(240,244,252,0.98);
+  --ov: rgba(242,245,252,1.0);
   --ov-seg: rgba(13,26,46,0.08);
   --ov-seg-a: rgba(13,26,46,0.15);
   --ov-si: rgba(13,26,46,0.06);
@@ -227,14 +227,14 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 #lv.open { display: flex; }
 .lv-top { display: flex; align-items: center; justify-content: space-between; padding: 54px 20px 8px; }
 .lv-top h1 { font-size: 30px; font-weight: 500; color: var(--tx); }
-.lv-done { background: var(--ov-seg); border: none; border-radius: 10px; padding: 7px 18px; font-size: 15px; color: var(--tx); cursor: pointer; font-family: inherit; }
+.lv-done { background: var(--ov-seg); border: .5px solid var(--ov-si-b); border-radius: 10px; padding: 7px 18px; font-size: 15px; color: var(--tx); cursor: pointer; font-family: inherit; font-weight: 500; }
 .lv-ctrl { display: flex; align-items: center; justify-content: space-between; padding: 2px 20px 10px; }
 .useg { display: flex; background: var(--ov-seg); border-radius: 10px; overflow: hidden; }
 .useg button { background: none; border: none; color: var(--tx3); font-size: 14px; font-weight: 600; padding: 7px 16px; cursor: pointer; font-family: inherit; transition: all .2s; }
 .useg button.active { background: var(--ov-seg-a); color: var(--tx); border-radius: 10px; }
 .edbtn { background: none; border: none; color: var(--tx3); font-size: 14px; cursor: pointer; font-family: inherit; }
 .lv-sw { padding: 0 16px 8px; }
-.lv-si { width: 100%; background: var(--ov-si); border: .5px solid var(--ov-si-b); border-radius: 14px; padding: 11px 16px 11px 38px; font-size: 16px; color: var(--tx); outline: none; font-family: inherit; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='rgba(128,128,128,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
+.lv-si { width: 100%; background: var(--ov-si); border: 1px solid var(--ov-si-b); border-radius: 14px; padding: 11px 16px 11px 38px; font-size: 16px; color: var(--tx); outline: none; font-family: inherit; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='rgba(128,128,128,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 12px center; }
 .lv-si::placeholder { color: var(--tx3); }
 .sres { background: var(--ov-sri); border-radius: 14px; margin: 0 16px 10px; overflow: hidden; max-height: 220px; overflow-y: auto; display: none; border: .5px solid var(--ov-si-b); }
 .sri { padding: 12px 16px; cursor: pointer; border-bottom: .5px solid var(--ov-sep); }
@@ -246,12 +246,17 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 .pc { border-radius: 20px; padding: 16px 18px; margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; min-height: 88px; display: flex; }
 .pc-bg { position: absolute; inset: 0; z-index: 0; }
 .pc-body { position: relative; z-index: 1; width: 100%; display: flex; justify-content: space-between; align-items: flex-start; }
-.pc-l .pc-city { font-size: 20px; font-weight: 500; }
-.pc-l .pc-reg { font-size: 12px; opacity: .62; margin-top: 1px; }
-.pc-l .pc-cnd { font-size: 13px; opacity: .72; margin-top: 10px; }
+.pc-l .pc-city { font-size: 20px; font-weight: 500; color: #fff; }
+.pc-l .pc-reg { font-size: 12px; opacity: .65; margin-top: 1px; color: #fff; }
+.pc-l .pc-cnd { font-size: 13px; opacity: .75; margin-top: 10px; color: #fff; }
 .pc-r { text-align: right; }
-.pc-t { font-size: 44px; font-weight: 200; line-height: 1; }
-.pc-b { font-size: 12px; opacity: .55; margin-top: 3px; }
+.pc-t { font-size: 44px; font-weight: 200; line-height: 1; color: #fff; }
+.pc-b { font-size: 12px; opacity: .6; margin-top: 3px; color: #fff; }
+[data-mode="light"] .pc-l .pc-city { color: #0d1a2e; }
+[data-mode="light"] .pc-l .pc-reg  { color: #0d1a2e; }
+[data-mode="light"] .pc-l .pc-cnd  { color: #0d1a2e; }
+[data-mode="light"] .pc-t           { color: #0d1a2e; }
+[data-mode="light"] .pc-b           { color: #0d1a2e; }
 .pc-del { position: absolute; top: 10px; right: 10px; z-index: 5; background: rgba(255,59,48,.9); border-radius: 50%; width: 24px; height: 24px; display: none; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; color: #fff; }
 .pc.editing .pc-del { display: flex; }
 
@@ -333,7 +338,9 @@ const LIGHT_SCENES={
   night_clear:{top:'#1a2848',mid:'#243260',base:'#1c2850',moon:true,stars:true},
 };
 
-const GRADS=[['#0d3060','#061840'],['#1a3a1a','#0a1e0a'],['#3a1a0a','#1e0a06'],['#1a0a3a','#0e0620'],['#0a2a3a','#061520'],['#3a0a1a','#200610'],['#0a3a2a','#061e14'],['#2a1a0a','#150d06']];
+const GRADS_DARK=[['#0d3060','#061840'],['#1a3a1a','#0a1e0a'],['#3a1a0a','#1e0a06'],['#1a0a3a','#0e0620'],['#0a2a3a','#061520'],['#3a0a1a','#200610'],['#0a3a2a','#061e14'],['#2a1a0a','#150d06']];
+const GRADS_LIGHT=[['#dbeafe','#bfdbfe'],['#dcfce7','#bbf7d0'],['#fef3c7','#fde68a'],['#ede9fe','#ddd6fe'],['#cffafe','#a5f3fc'],['#fce7f3','#fbcfe8'],['#d1fae5','#a7f3d0'],['#ffedd5','#fed7aa']];
+const getGrads=()=>mode==='light'?GRADS_LIGHT:GRADS_DARK;
 
 /* ── STATE ── */
 let places=JSON.parse(localStorage.getItem('wx4_p')||'null')||[{id:'chs',name:'Charleston',region:'Illinois',country:'US',lat:39.4942,lon:-88.1761,isDefault:true}];
@@ -678,7 +685,7 @@ document.getElementById('lvDone').addEventListener('click',closeList);
 function renderList(){
   const container=document.getElementById('plist');container.innerHTML='';
   places.forEach((p,i)=>{
-    const[g1,g2]=GRADS[i%GRADS.length];
+    const[g1,g2]=getGrads()[i%getGrads().length];
     const data=p._data;
     const tC=data?Math.round(data.current.temperature_2m):null;
     const tF=tC!==null?cF(tC):null;
