@@ -2,7 +2,7 @@
   "name": "Skies Weather",
   "short_name": "Skies",
   "description": "Beautiful local weather app with saved places",
-  "start_url": "./skies-weather.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a2744",

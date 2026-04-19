@@ -1,6 +1,6 @@
 const CACHE = 'skies-v1';
 const ASSETS = [
-  './skies-weather.html',
+  './index.html',
   './manifest.json'
 ];
 

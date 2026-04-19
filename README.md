@@ -3,7 +3,7 @@
 ## Your folder should look like this:
 ```
 skies/
-├── skies-weather.html
+├── index.html
 ├── manifest.json
 ├── sw.js
 ├── icon-192.png      ← generate this (see below)
@@ -43,8 +43,8 @@ Go to https://favicon.io/favicon-generator/
 
 1. Open VS Code
 2. File → Open Folder → select your `skies/` folder
-3. Right-click `skies-weather.html` → "Open with Live Server"
-4. Chrome opens at `http://127.0.0.1:5500/skies-weather.html`
+3. Right-click `index.html` → "Open with Live Server"
+4. Chrome opens at `http://127.0.0.1:5500/index.html`
 
 **Install as a Mac app (Chrome):**
 - In Chrome, look for the install icon (⊕) in the address bar → Install "Skies Weather"
@@ -57,7 +57,7 @@ Go to https://favicon.io/favicon-generator/
 1. With Live Server running on your Mac, find your Mac's local IP:
    - System Settings → Wi-Fi → click your network → note the IP (e.g. 192.168.1.42)
 2. On your iPhone, open Safari and go to:
-   `http://192.168.1.42:5500/skies-weather.html`
+   `http://192.168.1.42:5500/index.html`
 3. Tap the Share button → **Add to Home Screen** → Add
 4. It installs as a full-screen app on your home screen ✓
 
@@ -65,7 +65,7 @@ Go to https://favicon.io/favicon-generator/
 
 ## Making edits
 
-1. Open `skies-weather.html` in VS Code
+1. Open `index.html` in VS Code
 2. Edit and save (⌘S)
 3. The browser auto-refreshes instantly — no manual reload needed
 
