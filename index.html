@@ -70,8 +70,7 @@
 
 /* ── RESET ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
-body { position: fixed; width: 100%; }
+html, body { height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; }
 body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; color: var(--tx); background: #0a0a0f; transition: color 0.4s; }
 
 /* ── SCENE ── */
@@ -99,9 +98,9 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 [data-mode="light"] #light-overlay { background: rgba(220,235,255,0.45); }
 
 /* ── SHELL ── */
-#app { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; flex-direction: column; overflow: hidden; }
-#deck { flex: 1; display: flex; transition: transform .42s cubic-bezier(.4,0,.2,1); will-change: transform; min-height: 0; }
-.slide { min-width: 100vw; height: 100%; overflow-y: scroll; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 100px; touch-action: pan-y; overscroll-behavior-y: contain; }
+#app { position: relative; z-index: 10; width: 100%; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+#deck { flex: 1; display: flex; transition: transform .42s cubic-bezier(.4,0,.2,1); will-change: transform; }
+.slide { min-width: 100vw; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 96px; touch-action: pan-y; }
 .slide::-webkit-scrollbar { display: none; }
 
 /* ── TOP BAR ── */
@@ -265,6 +264,67 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 @keyframes twinkle { 0%,100% { opacity:.5; } 50% { opacity:1; } }
 @keyframes fogDrift { 0%,100% { transform:translateX(-8%); } 50% { transform:translateX(8%); } }
 .fadein { animation: fadeUp .5s ease both; }
+
+/* ── PULL TO REFRESH ── */
+.ptr-wrap { display:flex; align-items:center; justify-content:center; height:0; overflow:hidden; transition:height .25s ease; }
+.ptr-wrap.showing { height:44px; }
+.ptr-inner { display:flex; align-items:center; gap:8px; color:var(--tx3); font-size:12px; }
+.ptr-spinner { width:16px; height:16px; border-radius:50%; border:1.5px solid var(--tx3); border-top-color:var(--tx2); animation:spin .7s linear infinite; }
+.ptr-arrow { width:14px; height:14px; border:1.5px solid var(--tx3); border-top:none; border-right:none; transform:rotate(-45deg); transition:transform .3s; }
+.ptr-arrow.ready { transform:rotate(135deg); }
+
+/* ── LAST UPDATED ── */
+.updated-bar { display:flex; align-items:center; justify-content:space-between; padding:6px 22px 0; }
+.updated-txt { font-size:11px; color:var(--tx3); }
+.updated-dot { width:5px; height:5px; border-radius:50%; background:#4ade80; flex-shrink:0; }
+.updated-dot.stale { background:#f87171; }
+
+/* ── FEELS LIKE CARD ── */
+.feels-card-body { display:flex; align-items:center; padding:10px 16px 14px; gap:12px; }
+.feels-big { font-size:36px; font-weight:200; color:var(--tx); line-height:1; flex-shrink:0; }
+.feels-right { flex:1; }
+.feels-reason { font-size:13px; color:var(--tx2); line-height:1.45; }
+.feels-comfort-wrap { margin-top:7px; }
+.feels-track { height:3px; background:var(--bar-bg); border-radius:3px; overflow:hidden; }
+.feels-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#60a5fa,#4ade80,#f97316); }
+.feels-labels { display:flex; justify-content:space-between; margin-top:3px; }
+.feels-lbl { font-size:10px; color:var(--tx3); }
+
+/* ── HOURLY WIND ── */
+.hwind { font-size:10px; color:var(--pop); margin-top:-2px; }
+.hwind.strong { color:#f87171; }
+
+/* ── DAILY GRAPH ── */
+.graph-card-body { padding:8px 14px 14px; }
+.graph-legend { display:flex; gap:14px; margin-top:6px; }
+.gl-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--tx3); }
+.gl-line { width:18px; height:2px; border-radius:1px; }
+
+/* ── HISTORY ── */
+.hist-body { padding:8px 16px 14px; display:flex; flex-direction:column; gap:10px; }
+.hist-row { display:flex; align-items:flex-start; gap:10px; }
+.hist-badge { border-radius:8px; padding:3px 10px; flex-shrink:0; }
+.hist-badge.warm { background:rgba(251,191,36,.15); border:.5px solid rgba(251,191,36,.35); }
+.hist-badge.cool { background:rgba(96,165,250,.12); border:.5px solid rgba(96,165,250,.3); }
+.hist-badge.normal { background:rgba(74,222,128,.12); border:.5px solid rgba(74,222,128,.3); }
+.hist-badge-t { font-size:12px; font-weight:500; }
+.hist-badge.warm .hist-badge-t { color:#fbbf24; }
+.hist-badge.cool .hist-badge-t { color:#60a5fa; }
+.hist-badge.normal .hist-badge-t { color:#4ade80; }
+.hist-desc { font-size:13px; color:var(--tx2); line-height:1.45; }
+
+/* ── SWIPE UP SHEET ── */
+.sheet-hint { display:flex; flex-direction:column; align-items:center; padding:8px 0 6px; gap:3px; cursor:pointer; }
+.sheet-handle { width:32px; height:3px; background:var(--tx3); border-radius:2px; opacity:.5; }
+.sheet-lbl { font-size:10px; color:var(--tx3); }
+#detail-sheet { overflow:hidden; max-height:0; transition:max-height .4s cubic-bezier(.4,0,.2,1); }
+#detail-sheet.open { max-height:500px; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; }
+.dg-cell { padding:12px 16px; border-top:.5px solid var(--row-sep); }
+.dg-cell:nth-child(odd) { border-right:.5px solid var(--row-sep); }
+.dg-ic { font-size:14px; }
+.dg-val { font-size:18px; font-weight:300; color:var(--tx); margin-top:2px; }
+.dg-lbl { font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:.06em; margin-top:1px; }
 </style>
 </head>
 <body>
@@ -446,7 +506,7 @@ function stopLt(){if(ltTimer){clearTimeout(ltTimer);ltTimer=null;}document.getEl
 async function wxFetch(lat,lon){
   const k=`${lat.toFixed(2)}_${lon.toFixed(2)}`;
   const c=wxCache[k];if(c&&Date.now()-c.ts<600000)return c.data;
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset&timezone=auto&forecast_days=10`;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index,visibility&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset&timezone=auto&forecast_days=10`;
   const res=await fetch(url);if(!res.ok)throw new Error();
   const data=await res.json();
   // Also fetch AQI
@@ -454,6 +514,16 @@ async function wxFetch(lat,lon){
     const aqiUrl=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi&timezone=auto`;
     const aqiRes=await fetch(aqiUrl);if(aqiRes.ok){const aqiData=await aqiRes.json();data._aqi=aqiData.current?.european_aqi??null;}
   }catch{}
+  // Historical climate normals (Open-Meteo archive)
+  try{
+    const today=new Date();
+    const yr=today.getFullYear()-1;
+    const mm=String(today.getMonth()+1).padStart(2,'0');
+    const dd=String(today.getDate()).padStart(2,'0');
+    const histUrl=`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${yr}-${mm}-${dd}&end_date=${yr}-${mm}-${dd}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
+    const hr=await fetch(histUrl);if(hr.ok){const hd=await hr.json();data._hist=hd.daily;}
+  }catch{}
+  data._fetchedAt=Date.now();
   wxCache[k]={ts:Date.now(),data};
   try{localStorage.setItem('wx4_c2',JSON.stringify(wxCache));}catch{}
   return data;
@@ -461,6 +531,109 @@ async function wxFetch(lat,lon){
 async function geo(q){const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en`);const d=await r.json();return d.results||[];}
 
 /* ── SLIDE BUILDER ── */
+
+/* ── FEELS LIKE REASON ── */
+function feelsReason(actual, apparent, windKph, humidity){
+  const diff=apparent-actual;
+  if(windKph>20&&diff<-2)return`Feels ${Math.abs(Math.round(diff))}° colder due to ${Math.round(windKph)} km/h winds`;
+  if(humidity>75&&diff>2)return`Feels ${Math.round(diff)}° warmer due to high humidity (${humidity}%)`;
+  if(diff<-4)return`Wind chill makes it feel significantly colder`;
+  if(diff>3)return`Humidity is making it feel warmer`;
+  return`Similar to the actual temperature`;
+}
+function comfortPct(tempC){
+  // 18-22°C = 100% comfort. Map to 0-100
+  if(tempC<=0)return 5;
+  if(tempC>=38)return 95;
+  const ideal=20;
+  return Math.round(Math.max(5,Math.min(95,50+((tempC-ideal)/ideal)*40)));
+}
+
+/* ── LAST UPDATED LABEL ── */
+function updatedLabel(ts){
+  if(!ts)return{txt:'Fetching…',stale:false};
+  const mins=Math.round((Date.now()-ts)/60000);
+  const stale=mins>15;
+  const txt=mins<1?'Updated just now':mins===1?'Updated 1 min ago':`Updated ${mins} min ago`;
+  return{txt,stale};
+}
+
+/* ── HISTORY CARD ── */
+function buildHistory(data){
+  if(!data._hist||!data._hist.temperature_2m_max)return'';
+  const avgHi=data._hist.temperature_2m_max[0];
+  const avgLo=data._hist.temperature_2m_min[0];
+  const todayHi=data.daily.temperature_2m_max[0];
+  const todayLo=data.daily.temperature_2m_min[0];
+  if(avgHi==null)return'';
+  const hiDiff=Math.round(todayHi-avgHi);
+  const hiCls=hiDiff>1?'warm':hiDiff<-1?'cool':'normal';
+  const hiLbl=hiDiff>1?`+${hiDiff}° above avg`:hiDiff<-1?`${hiDiff}° below avg`:'Near average';
+  const hiDesc=hiDiff>1?`Warmer than usual. Avg high for today is ${Math.round(avgHi)}°.`
+    :hiDiff<-1?`Cooler than usual. Avg high for today is ${Math.round(avgHi)}°.`
+    :`Close to the typical high of ${Math.round(avgHi)}° for this time of year.`;
+  const precip=data.daily.precipitation_sum?.[0]??0;
+  const avgPrecip=data._hist.precipitation_sum?.[0]??0;
+  const precipDiff=precip-avgPrecip;
+  const precipCls=precipDiff>1?'cool':precipDiff<-0.5?'warm':'normal';
+  const precipLbl=precipDiff>1?'Wetter':'Drier';
+  const precipDesc=precipDiff>1?`More rain than average (avg ${avgPrecip.toFixed(1)}mm).`
+    :`Less rain than the typical ${avgPrecip.toFixed(1)}mm for this date.`;
+  return`<div class="card"><div class="clabel">📊 Historical Context</div>
+    <div class="hist-body">
+      <div class="hist-row">
+        <div class="hist-badge ${hiCls}"><div class="hist-badge-t">${hiLbl}</div></div>
+        <div class="hist-desc">${hiDesc}</div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-badge ${precipCls}"><div class="hist-badge-t">${precipLbl}</div></div>
+        <div class="hist-desc">${precipDesc}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── DAILY GRAPH ── */
+function buildGraph(daily, unit){
+  const aHi=daily.temperature_2m_max||[];
+  const aLo=daily.temperature_2m_min||[];
+  const days=(daily.time||[]).slice(0,7);
+  if(!days.length)return'';
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const allVals=[...aHi,...aLo].filter(v=>v!=null);
+  const vMin=Math.min(...allVals)-2, vMax=Math.max(...allVals)+2;
+  const vRange=vMax-vMin||1;
+  const W=300, H=70, PAD=20, bw=(W-PAD*2)/Math.max(days.length-1,1);
+  const yOf=v=>((vMax-v)/vRange*(H-14)+7).toFixed(1);
+  const xOf=i=>(PAD+i*bw).toFixed(1);
+  const hiPts=aHi.slice(0,7).map((v,i)=>`${xOf(i)},${yOf(v)}`).join(' ');
+  const loPts=aLo.slice(0,7).map((v,i)=>`${xOf(i)},${yOf(v)}`).join(' ');
+  const hiDots=aHi.slice(0,7).map((v,i)=>`<circle cx="${xOf(i)}" cy="${yOf(v)}" r="3" fill="#f97316"/>`).join('');
+  const loDots=aLo.slice(0,7).map((v,i)=>`<circle cx="${xOf(i)}" cy="${yOf(v)}" r="3" fill="#60a5fa"/>`).join('');
+  const labels=days.map((t,i)=>{
+    const d=new Date(t+'T12:00:00');
+    const lbl=i===0?'Today':DAYS[d.getDay()];
+    return`<text x="${xOf(i)}" y="${H+10}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.38)" font-family="-apple-system,sans-serif">${lbl}</text>`;
+  }).join('');
+  const hiLabels=aHi.slice(0,7).map((v,i)=>{
+    const disp=unit==='F'?Math.round(v*9/5+32):Math.round(v);
+    return`<text x="${xOf(i)}" y="${(parseFloat(yOf(v))-5).toFixed(1)}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.6)" font-family="-apple-system,sans-serif">${disp}°</text>`;
+  }).join('');
+  return`<div class="card"><div class="clabel">📈 7-Day Temperature</div>
+    <div class="graph-card-body">
+      <svg width="100%" viewBox="0 0 ${W} ${H+16}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+        <polyline points="${hiPts}" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="${loPts}" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${hiDots}${loDots}${labels}${hiLabels}
+      </svg>
+      <div class="graph-legend">
+        <div class="gl-item"><div class="gl-line" style="background:#f97316"></div>High</div>
+        <div class="gl-item"><div class="gl-line" style="background:#60a5fa"></div>Low</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function buildSlide(p,data){
   const c=data.current,w=gW(c.weather_code),u=unit;
   const tC=Math.round(c.temperature_2m),tF=cF(c.temperature_2m);
@@ -500,7 +673,8 @@ function buildSlide(p,data){
   const hTmp=data.hourly.temperature_2m.slice(hStart,hStart+24);
   const hCd=data.hourly.weather_code.slice(hStart,hStart+24);
   const hPop=data.hourly.precipitation_probability.slice(hStart,hStart+24);
-  const hourHTML=hT.map((t,i)=>{const wh=gW(hCd[i]);const main=fmt(hTmp[i],u);const alt=u==='C'?cF(hTmp[i]):Math.round(hTmp[i]);return`<div class="hc${i===0?' now':''}"><div class="ht">${i===0?'Now':hLbl(t)}</div>${hPop[i]>15?`<div class="hpop">${hPop[i]}%</div>`:`<div class="hpop" style="visibility:hidden">0</div>`}<div class="hi-e">${wh.i}</div><div class="htemp">${main}°</div><div class="htempsub">${alt}${u==='C'?'°F':'°C'}</div></div>`;}).join('');
+  const hWind=(data.hourly.wind_speed_10m||[]).slice(hStart,hStart+24);
+  const hourHTML=hT.map((t,i)=>{const wh=gW(hCd[i]);const main=fmt(hTmp[i],u);const alt=u==='C'?cF(hTmp[i]):Math.round(hTmp[i]);const ws=Math.round(hWind[i]||0);const wStrong=ws>=30;return`<div class="hc${i===0?' now':''}"><div class="ht">${i===0?'Now':hLbl(t)}</div>${hPop[i]>15?`<div class="hpop">${hPop[i]}%</div>`:`<div class="hpop" style="visibility:hidden">0</div>`}<div class="hi-e">${wh.i}</div><div class="htemp">${main}°</div><div class="htempsub">${alt}${u==='C'?'°F':'°C'}</div>${ws?`<div class="hwind${wStrong?' strong':''}">${ws}km/h</div>`:''}</div>`;}).join('');
 
   // Daily
   const aHi=data.daily.temperature_2m_max||[],aLo=data.daily.temperature_2m_min||[];
@@ -570,11 +744,30 @@ function buildSlide(p,data){
 
     <div class="summary">${summary}</div>
 
+    <div class="updated-bar">
+      <span class="updated-txt" id="updTxt-${p.id||idx}">Updated just now</span>
+      <div class="updated-dot${data._fetchedAt&&(Date.now()-data._fetchedAt)>900000?' stale':''}" ></div>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <div class="clabel">🌡 Feels Like</div>
+      <div class="feels-card-body">
+        <div class="feels-big">${fDisp}°</div>
+        <div class="feels-right">
+          <div class="feels-reason">${feelsReason(c.temperature_2m,c.apparent_temperature,c.wind_speed_10m,c.relative_humidity_2m)}</div>
+          <div class="feels-comfort-wrap">
+            <div class="feels-track"><div class="feels-fill" style="width:${comfortPct(c.apparent_temperature)}%"></div></div>
+            <div class="feels-labels"><span class="feels-lbl">Very cold</span><span class="feels-lbl">Comfortable</span><span class="feels-lbl">Very hot</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card" style="margin-top:10px">
       <div class="stats">
         <div class="stat"><div class="s-ic">💧</div><div class="s-v">${c.relative_humidity_2m}%</div><div class="s-l">Humidity</div></div>
         <div class="stat"><div class="s-ic">💨</div><div class="s-v">${Math.round(c.wind_speed_10m)}</div><div class="s-l">km/h ${wDir}</div></div>
-        <div class="stat"><div class="s-ic">🌡</div><div class="s-v">${fDisp}°</div><div class="s-l">${fDesc}</div></div>
+        <div class="stat"><div class="s-ic">🌡</div><div class="s-v">${fDisp}°</div><div class="s-l">Feels like</div></div>
         <div class="stat"><div class="s-ic">☀️</div><div class="s-v">${Math.round(uv)}</div><div class="s-l">${uvL} UV</div></div>
         <div class="stat"><div class="s-ic">🌊</div><div class="s-v">${Math.round(c.surface_pressure)}</div><div class="s-l">hPa</div></div>
         <div class="stat"><div class="s-ic">🌧</div><div class="s-v">${c.precipitation}</div><div class="s-l">mm/hr</div></div>
@@ -603,8 +796,27 @@ function buildSlide(p,data){
       ${dayHTML}
     </div>
 
+    ${buildGraph(data.daily,unit)}
+    ${buildHistory(data)}
     ${aqiHTML}
     ${moonHTML}
+
+    <div class="card">
+      <div class="sheet-hint" id="sheetHint" onclick="toggleSheet()">
+        <div class="sheet-handle"></div>
+        <span class="sheet-lbl">more details</span>
+      </div>
+      <div id="detail-sheet">
+        <div class="detail-grid">
+          <div class="dg-cell"><div class="dg-ic">👁</div><div class="dg-val">${c.visibility!=null?Math.round(c.visibility/1000)+' km':'—'}</div><div class="dg-lbl">Visibility</div></div>
+          <div class="dg-cell"><div class="dg-ic">🌊</div><div class="dg-val">${Math.round(c.surface_pressure)} hPa</div><div class="dg-lbl">Pressure</div></div>
+          <div class="dg-cell"><div class="dg-ic">💨</div><div class="dg-val">${Math.round(c.wind_speed_10m)} km/h</div><div class="dg-lbl">Wind ${dirs[Math.round(c.wind_direction_10m/45)%8]}</div></div>
+          <div class="dg-cell"><div class="dg-ic">💧</div><div class="dg-val">${c.relative_humidity_2m}%</div><div class="dg-lbl">Humidity</div></div>
+          <div class="dg-cell"><div class="dg-ic">🌧</div><div class="dg-val">${c.precipitation} mm</div><div class="dg-lbl">Precip/hr</div></div>
+          <div class="dg-cell"><div class="dg-ic">☀️</div><div class="dg-val">${Math.round(uv)}</div><div class="dg-lbl">${uvL} UV</div></div>
+        </div>
+      </div>
+    </div>
 
     <div class="oc-section">
       <div class="oc-head">
@@ -623,7 +835,7 @@ function rebuildDeck(){
   deck.innerHTML='';dotsEl.innerHTML='';
   places.forEach((p,i)=>{
     const s=document.createElement('div');s.className='slide';s.id=`s${i}`;
-    s.innerHTML=`<div class="lscreen"><div class="spin"></div><div style="font-size:13px;margin-top:8px">${p.name}</div></div>`;
+    s.innerHTML=`<div class="ptr-wrap"><div class="ptr-inner"><div class="ptr-arrow"></div><span>Release to refresh</span></div></div><div class="lscreen"><div class="spin"></div><div style="font-size:13px;margin-top:8px">${p.name}</div></div>`;
     deck.appendChild(s);
     const d=document.createElement('div');d.className=`dot${p.isDefault?' ml':''}${i===idx?' active':''}`;
     d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);
@@ -652,20 +864,9 @@ function goTo(i,anim=true){
 }
 
 /* ── SWIPE ── */
-deck.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;drag=false;ddx=0;},{passive:true});
-deck.addEventListener('touchmove',e=>{
-  const dX=e.touches[0].clientX-tx,dY=e.touches[0].clientY-ty;
-  // Only start horizontal drag if clearly more horizontal than vertical AND moved enough
-  if(!drag){
-    if(Math.abs(dX)<8&&Math.abs(dY)<8)return; // haven't moved enough yet
-    if(Math.abs(dY)>=Math.abs(dX))return; // vertical — let slide scroll handle it
-    drag=true; // clearly horizontal
-  }
-  ddx=dX;
-  deck.style.transition='none';
-  deck.style.transform=`translateX(calc(-${idx*100}vw + ${dX}px))`;
-},{passive:true});
-deck.addEventListener('touchend',()=>{if(!drag)return;if(ddx<-55)goTo(idx+1);else if(ddx>55)goTo(idx-1);else goTo(idx);drag=false;deck.style.transition='transform .42s cubic-bezier(.4,0,.2,1)';});
+deck.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;drag=false;ddx=0;deck.style.transition='none';},{passive:true});
+deck.addEventListener('touchmove',e=>{const dX=e.touches[0].clientX-tx,dY=e.touches[0].clientY-ty;if(!drag&&Math.abs(dY)>Math.abs(dX))return;drag=true;ddx=dX;deck.style.transform=`translateX(calc(-${idx*100}vw + ${dX}px))`;},{passive:true});
+deck.addEventListener('touchend',()=>{if(!drag)return;if(ddx<-55)goTo(idx+1);else if(ddx>55)goTo(idx-1);else goTo(idx);drag=false;});
 
 /* ── THEME ── */
 function applyMode(m){
@@ -722,6 +923,66 @@ function syncUnit(){document.getElementById('gC').classList.toggle('active',unit
 document.getElementById('gC').addEventListener('click',()=>{unit='C';localStorage.setItem('wx4_u','C');syncUnit();renderList();reRender();});
 document.getElementById('gF').addEventListener('click',()=>{unit='F';localStorage.setItem('wx4_u','F');syncUnit();renderList();reRender();});
 document.getElementById('locBtn').addEventListener('click',()=>{if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(async pos=>{const{latitude:lat,longitude:lon}=pos.coords;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);const d=await r.json();const city=d.address.city||d.address.town||d.address.village||'My Location';const country=d.address.country_code?.toUpperCase()||'';if(!places.find(p=>Math.abs(p.lat-lat)<.1&&Math.abs(p.lon-lon)<.1)){const np={id:'gps',name:city,region:d.address.state||'',country,lat,lon};places.unshift(np);savP();idx=0;rebuildDeck();}}catch{}});});
+
+
+/* ── SHEET TOGGLE ── */
+function toggleSheet(){
+  const sheet=document.getElementById('detail-sheet');
+  const hint=document.getElementById('sheetHint');
+  if(!sheet)return;
+  const open=sheet.classList.toggle('open');
+  if(hint){const lbl=hint.querySelector('.sheet-lbl');if(lbl)lbl.textContent=open?'less details':'more details';}
+}
+
+/* ── PULL TO REFRESH ── */
+(function(){
+  let startY=0,pulling=false,released=false;
+  const THRESHOLD=70;
+  function getSlide(){return document.getElementById('s'+idx);}
+  document.addEventListener('touchstart',e=>{
+    const sl=getSlide();if(!sl)return;
+    if(sl.scrollTop===0){startY=e.touches[0].clientY;pulling=true;released=false;}
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!pulling)return;
+    const sl=getSlide();if(!sl)return;
+    const dy=e.touches[0].clientY-startY;
+    if(dy<0){pulling=false;return;}
+    const ptr=sl.querySelector('.ptr-wrap');if(!ptr)return;
+    const arrow=sl.querySelector('.ptr-arrow');
+    if(dy>20){ptr.classList.add('showing');}
+    if(arrow){arrow.classList.toggle('ready',dy>THRESHOLD);}
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!pulling)return;pulling=false;
+    const sl=getSlide();if(!sl)return;
+    const ptr=sl.querySelector('.ptr-wrap');if(ptr)ptr.classList.remove('showing');
+    const arrow=sl.querySelector('.ptr-arrow');
+    const dy=e.changedTouches[0].clientY-startY;
+    if(dy>THRESHOLD&&!released){
+      released=true;
+      const p=places[idx];if(!p)return;
+      const k=`${p.lat.toFixed(2)}_${p.lon.toFixed(2)}`;
+      delete wxCache[k];
+      try{localStorage.setItem('wx4_c2',JSON.stringify(wxCache));}catch{}
+      loadSlide(p,idx);
+      showToast('🔄 Refreshing…');
+    }
+  },{passive:true});
+})();
+
+/* ── UPDATE TIMESTAMPS ── */
+function updateTimestamps(){
+  places.forEach((p,i)=>{
+    const el=document.getElementById('updTxt-'+(p.id||i));
+    if(!el||!p._data)return;
+    const{txt,stale}=updatedLabel(p._data._fetchedAt);
+    el.textContent=txt;
+    const dot=el.nextElementSibling;
+    if(dot){dot.classList.toggle('stale',stale);}
+  });
+}
+setInterval(updateTimestamps,60000);
 
 /* ── INIT ── */
 applyMode(mode);
