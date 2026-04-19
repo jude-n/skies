@@ -58,9 +58,19 @@
 
 /* ── RESET ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; }
+html { height: 100%; overflow: hidden; }
 /* iOS Safari fix: lock the body in place so rubber-banding doesn't affect slides */
-body { position: fixed; inset: 0; width: 100%; font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; color: var(--tx); background: #0a0a0f; transition: color 0.4s; }
+body {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif;
+  color: var(--tx);
+  background: #0a0a0f;
+  transition: color 0.4s;
+}
 
 /* ── SCENE ── */
 #scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; transition: background 2s ease; }
@@ -88,9 +98,35 @@ body { position: fixed; inset: 0; width: 100%; font-family: -apple-system,'SF Pr
 
 /* ── SHELL ── */
 /* ensure the shell truly fills the viewport; fixed prevents Safari chrome from creating visual gaps */
-#app { position: fixed; z-index: 10; width: 100%; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-#deck { flex: 1; display: flex; transition: transform .42s cubic-bezier(.4,0,.2,1); will-change: transform; }
-.slide { min-width: 100vw; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 96px; touch-action: pan-y; }
+#app {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#deck {
+  flex: 1;
+  display: flex;
+  transition: transform .42s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+  min-height: 0; /* crucial for flex child to allow scrolling */
+}
+.slide {
+  min-width: 100vw;
+  width: 100vw;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain; /* prevent scroll chaining to body */
+  scrollbar-width: none;
+  padding-bottom: 96px;
+  touch-action: pan-y;
+}
 .slide::-webkit-scrollbar { display: none; }
 
 /* ── TOP BAR ── */

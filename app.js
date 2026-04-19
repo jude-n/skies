@@ -499,38 +499,63 @@ function goTo(i,anim=true){
 (()=>{
   let startX=0,startY=0,dx=0,dy=0,direction=null,dragging=false;
   const THRESHOLD=55; // px to trigger a page change
-  const SLIDE_LOCK=6; // minimal movement to decide direction
+  const DIRECTION_LOCK=10; // minimal movement to decide direction
+
   deck.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;startY=e.touches[0].clientY;dx=0;dy=0;direction=null;dragging=false;deck.style.transition='none';
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    dx=0;
+    dy=0;
+    direction=null;
+    dragging=false;
+    // Don't set transition to none yet - wait until we know it's horizontal
   },{passive:true});
+
   deck.addEventListener('touchmove',e=>{
     const cx=e.touches[0].clientX, cy=e.touches[0].clientY;
-    dx=cx-startX; dy=cy-startY;
+    dx=cx-startX;
+    dy=cy-startY;
+
     if(!direction){
-      // wait until enough movement to determine intent
-      if(Math.abs(dx)<SLIDE_LOCK && Math.abs(dy)<SLIDE_LOCK) return;
-      direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
-      if(direction==='vertical'){
-        // let native vertical scroll handle it — reset any transform so deck stays in place
-        deck.style.transform = `translateX(-${idx*100}vw)`;
+      // Wait until enough movement to determine intent
+      if(Math.abs(dx)<DIRECTION_LOCK && Math.abs(dy)<DIRECTION_LOCK) return;
+
+      // Decide direction based on which axis has more movement
+      if(Math.abs(dy) >= Math.abs(dx)){
+        // Vertical scroll - completely step aside, let native handle it
+        direction='vertical';
         return;
       } else {
-        dragging = true;
+        // Horizontal swipe - take control
+        direction='horizontal';
+        dragging=true;
+        deck.style.transition='none';
       }
     }
+
     if(direction==='horizontal' && dragging){
-      // translate deck with finger
+      // Translate deck with finger
       deck.style.transform = `translateX(calc(-${idx*100}vw + ${dx}px))`;
     }
+    // If vertical, do nothing - native scroll handles it
   },{passive:true});
+
   deck.addEventListener('touchend',e=>{
-    if(!dragging) return; // vertical scroll or no intent
-    // commit
+    if(direction==='vertical' || !dragging){
+      // Was a vertical scroll or tap, reset
+      direction=null;
+      dragging=false;
+      return;
+    }
+
+    // Commit horizontal swipe
     deck.style.transition='transform .42s cubic-bezier(.4,0,.2,1)';
     if(dx<-THRESHOLD) goTo(idx+1);
     else if(dx>THRESHOLD) goTo(idx-1);
     else goTo(idx);
-    dragging=false; direction=null;
+
+    dragging=false;
+    direction=null;
   });
 })();
 
