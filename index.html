@@ -70,7 +70,7 @@
 
 /* ── RESET ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; -webkit-overflow-scrolling: touch; }
 body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; color: var(--tx); background: #0a0a0f; transition: color 0.4s; }
 
 /* ── SCENE ── */
@@ -100,7 +100,7 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 /* ── SHELL ── */
 #app { position: relative; z-index: 10; width: 100%; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 #deck { flex: 1; display: flex; transition: transform .42s cubic-bezier(.4,0,.2,1); will-change: transform; }
-.slide { min-width: 100vw; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 96px; }
+.slide { min-width: 100vw; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 96px; touch-action: pan-y; }
 .slide::-webkit-scrollbar { display: none; }
 
 /* ── TOP BAR ── */
@@ -145,8 +145,9 @@ body { font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif; 
 .sun-ic { font-size: 22px; }
 .sun-time { font-size: 18px; font-weight: 300; color: var(--tx); }
 .sun-lbl { font-size: 11px; color: var(--tx3); text-transform: uppercase; letter-spacing: .08em; }
-.sun-arc-wrap { position: relative; padding: 4px 20px 0; }
-.sun-arc svg { width: 100%; }
+.sun-arc-wrap { padding: 0 16px 4px; }
+.sun-progress { height: 4px; background: var(--bar-bg); border-radius: 4px; overflow: hidden; margin: 0 0 4px; }
+.sun-progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #f97316, #facc15); transition: width .6s ease; }
 
 /* ── HOURLY ── */
 .hscroll { overflow-x: auto; scrollbar-width: none; }
@@ -582,11 +583,7 @@ function buildSlide(p,data){
     <div class="card">
       <div class="clabel">🌅 Sunrise & Sunset</div>
       <div class="sun-arc-wrap">
-        <svg viewBox="0 0 300 70" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 30 60 A 120 120 0 0 1 270 60" fill="none" stroke="${mode==='dark'?'rgba(255,255,255,0.15)':'rgba(13,26,46,0.12)'}" stroke-width="2" stroke-dasharray="4 4"/>
-          <circle cx="${arcX}" cy="${arcY}" r="7" fill="#FFD95A" opacity="0.9"/>
-          <circle cx="${arcX}" cy="${arcY}" r="12" fill="#FFD95A" opacity="0.25"/>
-        </svg>
+        <div class="sun-progress"><div class="sun-progress-fill" style="width:${(arcPct*100).toFixed(1)}%"></div></div>
       </div>
       <div class="sun-row">
         <div class="sun-item"><div class="sun-ic">🌅</div><div class="sun-time">${srTime}</div><div class="sun-lbl">Sunrise</div></div>
