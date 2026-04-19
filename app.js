@@ -30,7 +30,9 @@ const GRADS=[['#0d3060','#061840'],['#1a3a1a','#0a1e0a'],['#3a1a0a','#1e0a06'],[
 
 /* ── STATE ── */
 let places=JSON.parse(localStorage.getItem('wx4_p')||'null')||[{id:'chs',name:'Charleston',region:'Illinois',country:'US',lat:39.4942,lon:-88.1761,isDefault:true}];
-localStorage.removeItem('wx3_c');let wxCache=JSON.parse(localStorage.getItem('wx4_c2')||'{}');
+localStorage.removeItem('wx3_c');
+if(!localStorage.getItem('wx5_init')){localStorage.removeItem('wx4_c2');localStorage.setItem('wx5_init','1');}
+let wxCache=JSON.parse(localStorage.getItem('wx4_c2')||'{}');
 let unit=localStorage.getItem('wx4_u')||'C';
 let mode=localStorage.getItem('wx4_m')||'dark';
 let idx=0,editing=false,tx=0,ty=0,drag=false,ddx=0;
@@ -499,7 +501,7 @@ function goTo(i,anim=true){
 (()=>{
   let startX=0,startY=0,dx=0,dy=0,direction=null,dragging=false;
   const THRESHOLD=55; // px to trigger a page change
-  const DIRECTION_LOCK=10; // minimal movement to decide direction
+  const DIRECTION_LOCK=14; // minimal movement to decide direction
 
   deck.addEventListener('touchstart',e=>{
     startX=e.touches[0].clientX;
@@ -508,7 +510,9 @@ function goTo(i,anim=true){
     dy=0;
     direction=null;
     dragging=false;
-    // Don't set transition to none yet - wait until we know it's horizontal
+    // If the current slide is scrolled down, bias toward vertical
+    const sl=document.getElementById('s'+idx);
+    if(sl&&sl.scrollTop>10) direction='vertical';
   },{passive:true});
 
   deck.addEventListener('touchmove',e=>{
@@ -521,12 +525,12 @@ function goTo(i,anim=true){
       if(Math.abs(dx)<DIRECTION_LOCK && Math.abs(dy)<DIRECTION_LOCK) return;
 
       // Decide direction based on which axis has more movement
-      if(Math.abs(dy) >= Math.abs(dx)){
-        // Vertical scroll - completely step aside, let native handle it
+      if(Math.abs(dy) >= Math.abs(dx) * 0.6){
+        // Vertical has meaningful component - let native scroll handle it
         direction='vertical';
         return;
       } else {
-        // Horizontal swipe - take control
+        // Clearly horizontal swipe - take control
         direction='horizontal';
         dragging=true;
         deck.style.transition='none';
@@ -615,6 +619,21 @@ document.getElementById('gC').addEventListener('click',()=>{unit='C';localStorag
 document.getElementById('gF').addEventListener('click',()=>{unit='F';localStorage.setItem('wx4_u','F');syncUnit();renderList();reRender();});
 document.getElementById('locBtn').addEventListener('click',()=>{if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(async pos=>{const{latitude:lat,longitude:lon}=pos.coords;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);const d=await r.json();const city=d.address.city||d.address.town||d.address.village||'My Location';const country=d.address.country_code?.toUpperCase()||'';if(!places.find(p=>Math.abs(p.lat-lat)<.1&&Math.abs(p.lon-lon)<.1)){const np={id:'gps',name:city,region:d.address.state||'',country,lat,lon};places.unshift(np);savP();idx=0;rebuildDeck();}}catch{}});});
 
+
+
+/* ── TOAST ── */
+function showToast(msg, dur=2200){
+  let t=document.getElementById('wx-toast');
+  if(!t){
+    t=document.createElement('div');t.id='wx-toast';
+    t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;background:rgba(30,40,60,0.95);border:.5px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 20px;font-size:14px;color:#fff;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;font-family:-apple-system,sans-serif;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},dur);
+}
 
 /* ── SHEET TOGGLE ── */
 function toggleSheet(){

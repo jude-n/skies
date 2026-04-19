@@ -113,19 +113,21 @@ body {
   display: flex;
   transition: transform .42s cubic-bezier(.4,0,.2,1);
   will-change: transform;
-  min-height: 0; /* crucial for flex child to allow scrolling */
+  min-height: 0;
+  height: 0; /* force flex child to respect parent height, enabling overflow-y on slides */
 }
 .slide {
   min-width: 100vw;
   width: 100vw;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: scroll; /* must be scroll not auto for iOS Safari */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain; /* prevent scroll chaining to body */
   scrollbar-width: none;
-  padding-bottom: 96px;
-  touch-action: pan-y;
+  padding-bottom: 100px;
+  touch-action: pan-y pinch-zoom;
+  /* iOS needs explicit positioning context */
+  position: relative;
 }
 .slide::-webkit-scrollbar { display: none; }
 

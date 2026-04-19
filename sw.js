@@ -1,6 +1,8 @@
-const CACHE = 'skies-v4';
+const CACHE = 'skies-v5';
 const ASSETS = [
   './index.html',
+  './styles.css',
+  './app.js',
   './manifest.json'
 ];
 
