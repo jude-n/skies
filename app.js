@@ -29,12 +29,35 @@ const LIGHT_SCENES={
 const GRADS=[['#0d3060','#061840'],['#1a3a1a','#0a1e0a'],['#3a1a0a','#1e0a06'],['#1a0a3a','#0e0620'],['#0a2a3a','#061520'],['#3a0a1a','#200610'],['#0a3a2a','#061e14'],['#2a1a0a','#150d06']];
 
 /* ── STATE ── */
-let places=JSON.parse(localStorage.getItem('wx4_p')||'null')||[{id:'chs',name:'Charleston',region:'Illinois',country:'US',lat:39.4942,lon:-88.1761,isDefault:true}];
-localStorage.removeItem('wx3_c');
-if(!localStorage.getItem('wx5_init')){localStorage.removeItem('wx4_c2');localStorage.setItem('wx5_init','1');}
-let wxCache=JSON.parse(localStorage.getItem('wx4_c2')||'{}');
-let unit=localStorage.getItem('wx4_u')||'C';
-let mode=localStorage.getItem('wx4_m')||'dark';
+// ── STORAGE KEYS ──
+// Intentionally separated so weather cache can be wiped on deploy
+// without ever touching saved cities or user preferences.
+const KEYS = {
+  places: 'skies_places',   // never wiped on deploy
+  unit:   'skies_unit',     // never wiped on deploy
+  mode:   'skies_mode',     // never wiped on deploy
+  cache:  'skies_cache_v1', // safe to wipe — just weather API responses
+};
+
+// Migrate old keys to new ones (one-time, preserves user's saved cities)
+(function migrate(){
+  if(localStorage.getItem('skies_migrated')) return;
+  const oldPlaces = localStorage.getItem('wx4_p');
+  const oldUnit   = localStorage.getItem('wx4_u');
+  const oldMode   = localStorage.getItem('wx4_m');
+  if(oldPlaces) localStorage.setItem(KEYS.places, oldPlaces);
+  if(oldUnit)   localStorage.setItem(KEYS.unit,   oldUnit);
+  if(oldMode)   localStorage.setItem(KEYS.mode,   oldMode);
+  // Wipe old cache keys — these are just API responses, safe to drop
+  ['wx3_c','wx4_c2','wx5_init'].forEach(k => localStorage.removeItem(k));
+  localStorage.setItem('skies_migrated', '1');
+})();
+
+let places = JSON.parse(localStorage.getItem(KEYS.places)||'null') ||
+  [{id:'chs',name:'Charleston',region:'Illinois',country:'US',lat:39.4942,lon:-88.1761,isDefault:true}];
+let wxCache = JSON.parse(localStorage.getItem(KEYS.cache)||'{}');
+let unit = localStorage.getItem(KEYS.unit) || 'C';
+let mode = localStorage.getItem(KEYS.mode) || 'dark';
 let idx=0,editing=false,tx=0,ty=0,drag=false,ddx=0;
 
 /* ── UTILS ── */
@@ -159,7 +182,7 @@ async function wxFetch(lat,lon){
   }catch{}
   data._fetchedAt=Date.now();
   wxCache[k]={ts:Date.now(),data};
-  try{localStorage.setItem('wx4_c2',JSON.stringify(wxCache));}catch{}
+  try{localStorage.setItem(KEYS.cache,JSON.stringify(wxCache));}catch{}
   return data;
 }
 async function geo(q){const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en`);const d=await r.json();return d.results||[];}
@@ -352,7 +375,7 @@ function buildSlide(p,data){
   </div>`;
 
   // Other cities
-  const others=places.filter((_,i)=>i!==idx).filter(p=>p._data);
+  const others=places.filter((op,i)=>i!==idx&&op!==p).filter(op=>op._data);
   const chipsHTML=others.map(op=>{const od=op._data.current,ow=gW(od.weather_code);const ot=fmt(od.temperature_2m,u);const oAlt=u==='C'?cF(od.temperature_2m):Math.round(od.temperature_2m);const oIdx=places.indexOf(op);return`<div class="chip" data-idx="${oIdx}"><div class="chip-name">${op.name}</div><div class="chip-cond">${ow.i} ${ow.l}</div><div class="chip-temp">${ot}°</div><div class="chip-alt">${oAlt}${u==='C'?'°F':'°C'}</div></div>`;}).join('');
 
   return`<div class="fadein">
@@ -482,7 +505,7 @@ async function loadSlide(p,i){
   catch{s.innerHTML=`<div class="lscreen" style="color:rgba(255,100,100,0.7)">⚠️ Failed<br>${p.name}</div>`;}
 }
 function attachEv(s){
-  s.querySelectorAll('.dp').forEach(b=>b.addEventListener('click',()=>{unit=b.dataset.u;localStorage.setItem('wx4_u',unit);syncUnit();reRender();}));
+  s.querySelectorAll('.dp').forEach(b=>b.addEventListener('click',()=>{unit=b.dataset.u;localStorage.setItem(KEYS.unit,unit);syncUnit();reRender();}));
   s.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>goTo(Number(c.dataset.idx))));
   const mb=s.querySelector('#menuBtn');if(mb)mb.addEventListener('click',openList);
   const tt=s.querySelector('#themeToggle');if(tt)tt.addEventListener('click',toggleTheme);
@@ -569,7 +592,7 @@ function applyMode(m){
   document.documentElement.setAttribute('data-mode',m);
   document.getElementById('themeColor').content=m==='dark'?'#0a0a0f':'#88c8f0';
   document.body.style.background=m==='dark'?'#0a0a0f':'#88c8f0';
-  localStorage.setItem('wx4_m',m);
+  localStorage.setItem(KEYS.mode,m);
   document.getElementById('themeBtn').textContent=m==='dark'?'☀️ Light':'🌙 Dark';
   syncUnit();
   const p=places[idx];if(p&&p._data)applyScene(p._data.current.weather_code);
@@ -579,7 +602,7 @@ function toggleTheme(){applyMode(mode==='dark'?'light':'dark');}
 document.getElementById('themeBtn').addEventListener('click',toggleTheme);
 
 /* ── LIST ── */
-function openList(){editing=false;document.getElementById('edBtn').textContent='Edit';renderList();document.getElementById('lv').classList.add('open');syncUnit();}
+function openList(){renderList();document.getElementById('lv').classList.add('open');syncUnit();}
 function closeList(){document.getElementById('lv').classList.remove('open');rebuildDeck();}
 document.getElementById('listBtn').addEventListener('click',openList);
 document.getElementById('lvDone').addEventListener('click',closeList);
@@ -596,16 +619,81 @@ function renderList(){
     const cond=data?gW(data.current.weather_code):{l:'Loading…',i:''};
     const hi=data?fmt(data.daily.temperature_2m_max[0],unit):'';
     const lo=data?fmt(data.daily.temperature_2m_min[0],unit):'';
+
+    // Wrapper handles the swipe reveal
+    const wrap=document.createElement('div');
+    wrap.className='pc-wrap';
+
+    // Delete button revealed underneath (non-default cities only)
+    if(!p.isDefault){
+      const delBtn=document.createElement('div');
+      delBtn.className='pc-swipe-del';
+      delBtn.textContent='Delete';
+      delBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        wrap.classList.add('removing');
+        setTimeout(()=>{
+          places.splice(i,1);
+          savP();
+          if(idx>=places.length)idx=places.length-1;
+          renderList();
+        },280);
+      });
+      wrap.appendChild(delBtn);
+    }
+
     const card=document.createElement('div');
-    card.className=`pc${editing?' editing':''}`;
-    card.innerHTML=`<div class="pc-bg" style="background:linear-gradient(135deg,${g1},${g2})"></div><div class="pc-body"><div class="pc-l"><div class="pc-city">${p.name}</div><div class="pc-reg">${p.isDefault?'Default · ':''}${p.region||p.country||''}</div><div class="pc-cnd">${cond.i} ${cond.l}</div></div><div class="pc-r"><div class="pc-t">${disp}°</div>${tC!==null?`<div class="pc-b">${alt}${altU} · H:${hi}° L:${lo}°</div>`:''}</div></div>${!p.isDefault?`<div class="pc-del" data-i="${i}">✕</div>`:''}`;
-    card.addEventListener('click',e=>{if(e.target.classList.contains('pc-del'))return;idx=i;closeList();});
-    const del=card.querySelector('.pc-del');if(del)del.addEventListener('click',e=>{e.stopPropagation();places.splice(i,1);savP();if(idx>=places.length)idx=places.length-1;renderList();});
-    container.appendChild(card);
+    card.className='pc';
+    card.innerHTML=`<div class="pc-bg" style="background:linear-gradient(135deg,${g1},${g2})"></div><div class="pc-body"><div class="pc-l"><div class="pc-city">${p.name}</div><div class="pc-reg">${p.isDefault?'Default · ':''}${p.region||p.country||''}</div><div class="pc-cnd">${cond.i} ${cond.l}</div></div><div class="pc-r"><div class="pc-t">${disp}°</div>${tC!==null?`<div class="pc-b">${alt}${altU} · H:${hi}° L:${lo}°</div>`:''}</div></div>`;
+
+    // Tap card to navigate (only if not mid-swipe)
+    card.addEventListener('click',()=>{
+      if(wrap.classList.contains('swiped'))return;
+      idx=i;closeList();
+    });
+
+    // Swipe-left to reveal delete, swipe-right to hide
+    if(!p.isDefault){
+      let sx=0,sy=0,swiping=false,decided=false;
+      card.addEventListener('touchstart',e=>{
+        sx=e.touches[0].clientX;sy=e.touches[0].clientY;
+        swiping=false;decided=false;
+      },{passive:true});
+      card.addEventListener('touchmove',e=>{
+        const dx=e.touches[0].clientX-sx;
+        const dy=e.touches[0].clientY-sy;
+        if(!decided){
+          if(Math.abs(dx)<6&&Math.abs(dy)<6)return;
+          decided=true;
+          if(Math.abs(dy)>Math.abs(dx)){return;} // vertical scroll
+          swiping=true;
+        }
+        if(!swiping)return;
+        const clamped=Math.min(0,Math.max(-90,dx+(wrap.classList.contains('swiped')?-90:0)));
+        card.style.transform=`translateX(${clamped}px)`;
+      },{passive:true});
+      card.addEventListener('touchend',e=>{
+        if(!swiping){card.style.transform='';return;}
+        const dx=e.changedTouches[0].clientX-sx;
+        const threshold=wrap.classList.contains('swiped')?20:-45;
+        if(dx<threshold){
+          wrap.classList.add('swiped');
+          card.style.transform='translateX(-90px)';
+        } else {
+          wrap.classList.remove('swiped');
+          card.style.transform='';
+        }
+        swiping=false;
+      },{passive:true});
+    }
+
+    wrap.appendChild(card);
+    container.appendChild(wrap);
   });
 }
-document.getElementById('edBtn').addEventListener('click',()=>{editing=!editing;document.getElementById('edBtn').textContent=editing?'Done':'Edit';renderList();});
-function savP(){localStorage.setItem('wx4_p',JSON.stringify(places.map(p=>({id:p.id,name:p.name,region:p.region,country:p.country,lat:p.lat,lon:p.lon,isDefault:p.isDefault}))));}
+// Edit button now just a no-op label since swipe-to-delete replaced it
+document.getElementById('edBtn').addEventListener('click',()=>{});
+function savP(){localStorage.setItem(KEYS.places,JSON.stringify(places.map(p=>({id:p.id,name:p.name,region:p.region,country:p.country,lat:p.lat,lon:p.lon,isDefault:p.isDefault}))));}
 
 /* ── SEARCH ── */
 let sT;
@@ -615,8 +703,8 @@ async function addP(r){if(places.find(p=>Math.abs(p.lat-r.latitude)<.05&&Math.ab
 
 /* ── UNIT + GPS ── */
 function syncUnit(){document.getElementById('gC').classList.toggle('active',unit==='C');document.getElementById('gF').classList.toggle('active',unit==='F');}
-document.getElementById('gC').addEventListener('click',()=>{unit='C';localStorage.setItem('wx4_u','C');syncUnit();renderList();reRender();});
-document.getElementById('gF').addEventListener('click',()=>{unit='F';localStorage.setItem('wx4_u','F');syncUnit();renderList();reRender();});
+document.getElementById('gC').addEventListener('click',()=>{unit='C';localStorage.setItem(KEYS.unit,'C');syncUnit();renderList();reRender();});
+document.getElementById('gF').addEventListener('click',()=>{unit='F';localStorage.setItem(KEYS.unit,'F');syncUnit();renderList();reRender();});
 document.getElementById('locBtn').addEventListener('click',()=>{if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(async pos=>{const{latitude:lat,longitude:lon}=pos.coords;try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);const d=await r.json();const city=d.address.city||d.address.town||d.address.village||'My Location';const country=d.address.country_code?.toUpperCase()||'';if(!places.find(p=>Math.abs(p.lat-lat)<.1&&Math.abs(p.lon-lon)<.1)){const np={id:'gps',name:city,region:d.address.state||'',country,lat,lon};places.unshift(np);savP();idx=0;rebuildDeck();}}catch{}});});
 
 
@@ -674,7 +762,7 @@ function toggleSheet(){
       const p=places[idx];if(!p)return;
       const k=`${p.lat.toFixed(2)}_${p.lon.toFixed(2)}`;
       delete wxCache[k];
-      try{localStorage.setItem('wx4_c2',JSON.stringify(wxCache));}catch{}
+      try{localStorage.setItem(KEYS.cache,JSON.stringify(wxCache));}catch{}
       loadSlide(p,idx);
       showToast('🔄 Refreshing…');
     }

@@ -1,38 +1,47 @@
 # Skies Weather
 
-A beautiful personal weather app — works on Mac, iPhone, and any browser. Built with vanilla HTML/JS, powered by free APIs, deployable to Vercel with zero cost.
+A beautiful personal weather app for Mac and iPhone. Built with vanilla HTML/CSS/JS, powered entirely by free APIs, deployed to Vercel at zero cost. No backend, no API keys, no accounts.
 
 ---
 
 ## Features
 
-- 🌤 Current conditions with animated background scenes (clear, rain, snow, thunder, fog, night)
-- 🌡 Both °C and °F always visible — tap to switch primary display
-- 📍 Default city: Charleston, IL — add and save unlimited cities
-- 📅 10-day forecast with temperature range bars
-- 🕐 24-hour hourly scroll with precipitation probability
-- 🌅 Sunrise & sunset with day progress indicator
-- 🌬 Air quality index (AQI) via Open-Meteo
-- 🌙 Moon phase calculated locally
-- ⚠️ Live weather alerts via NWS (US only, free)
-- 🛰 Rain radar map via Windy embed
-- 📤 Share weather summary (native share sheet or clipboard copy)
-- 🔔 Rain alert push notifications (browser-based, checks every 15 min)
-- 🔄 Manual refresh button
-- 🌙/☀️ Dark and light mode, persists across sessions
-- Works offline after first load (service worker caching)
+### Weather Data
+- 🌤 Current conditions with animated backgrounds (clear day/night, rain, snow, thunderstorm, fog, overcast)
+- 🌡 Both °C and °F always visible — tap either pill to switch the primary display
+- 📝 Plain-English daily summary ("Currently overcast at 16°C. Rain likely in about 3 hours.")
+- 📅 10-day forecast with gradient temperature range bars
+- 📈 7-day high/low temperature graph (line chart)
+- 🕐 24-hour hourly forecast with precipitation % and wind speed per hour
+- 🌅 Sunrise & sunset times with day-progress bar
+- 🌡 Feels like card — shows converted temp, plain-English reason (wind chill, humidity), and a comfort scale
 
----
+### Extra Cards
+- 🌬 Air Quality Index (AQI) with color-coded indicator bar
+- 🌙 Moon phase — calculated locally, shows phase name, % illuminated, and days to next full moon
+- 📊 Historical context — compares today's forecast to the same date last year
+- ⚠️ Live NWS weather alerts (US only) — appear as colored banners by severity
+- 🛰 Rain radar map via Windy embed, centered on current city
 
-## APIs Used (all free, no key required)
+### Cities & Navigation
+- 📍 Default city: Charleston, IL
+- ➕ Search and save unlimited cities — persists across sessions and app updates
+- ↔️ Swipe left/right between saved cities
+- 🗑 Swipe left on a city card to reveal Delete — no Edit mode needed
+- 🏙 Other Cities chips at the bottom — tap to jump directly to that city
 
-| API | Used for |
-|-----|----------|
-| [Open-Meteo](https://open-meteo.com) | Weather forecast, hourly, daily, AQI |
-| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | City search |
-| [Nominatim (OSM)](https://nominatim.org) | Reverse geocoding for GPS location |
-| [NWS (api.weather.gov)](https://www.weather.gov/documentation/services-web-api) | US weather alerts |
-| [Windy](https://embed.windy.com) | Rain radar embed |
+### Actions
+- 📤 Share button — native share sheet on iPhone, clipboard copy on desktop
+- 🔔 Rain alert notifications — browser push, checks every 15 min, fires when rain > 60% in next 3 hours
+- 🔄 Refresh button — clears cache for current city and refetches immediately
+- ⬇️ Pull-to-refresh — drag down from top of any city slide
+
+### App & Display
+- 🌙/☀️ Dark and light mode — tap the sun/moon icon, persists across sessions
+- 🕐 Last updated timestamp with green/red freshness indicator
+- ⬆️ "More details" expandable card — visibility, pressure, wind, humidity, precip, UV
+- 📱 PWA — installable on iPhone (Add to Home Screen) and Mac (Chrome install button)
+- 📶 Works offline after first load via service worker
 
 ---
 
@@ -40,75 +49,109 @@ A beautiful personal weather app — works on Mac, iPhone, and any browser. Buil
 
 ```
 skies/
-├── index.html       ← entire app (HTML + CSS + JS)
-├── manifest.json    ← PWA manifest
-├── sw.js            ← service worker (offline + push)
-├── icon-192.png     ← app icon (generate below)
-├── icon-512.png     ← app icon large (generate below)
+├── index.html       ← app shell (minimal — just loads CSS + JS)
+├── app.js           ← all logic, API calls, UI rendering
+├── styles.css       ← all styles and theme tokens
+├── manifest.json    ← PWA manifest (name, icons, display mode)
+├── sw.js            ← service worker (offline caching + push)
+├── icon-192.png     ← app icon 192×192 (generate below)
+├── icon-512.png     ← app icon 512×512 (generate below)
 └── README.md
 ```
 
 ---
 
+## APIs Used — all free, no key required
+
+| API | Purpose |
+|-----|---------|
+| [Open-Meteo Forecast](https://open-meteo.com) | Current, hourly, daily weather + AQI |
+| [Open-Meteo Archive](https://open-meteo.com/en/docs/historical-weather-api) | Historical climate data for context card |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | City search |
+| [Nominatim (OSM)](https://nominatim.org) | Reverse geocoding for GPS location |
+| [NWS api.weather.gov](https://www.weather.gov/documentation/services-web-api) | US weather alerts |
+| [Windy embed](https://embed.windy.com) | Rain radar map |
+
+---
+
 ## Setup
 
-### Step 1 — Create icons (2 min)
+### Step 1 — Create app icons (2 min)
 
-Go to https://favicon.io/favicon-generator/
+Go to [favicon.io/favicon-generator](https://favicon.io/favicon-generator/)
 - Text: `Sk` · Background: Rounded · Color: `#0a0a0f` · Font color: `#ffffff`
-- Download → rename `android-chrome-192x192.png` → `icon-192.png` and `android-chrome-512x512.png` → `icon-512.png`
-- Drop both into your project folder
+- Download the zip
+- Rename `android-chrome-192x192.png` → `icon-192.png`
+- Rename `android-chrome-512x512.png` → `icon-512.png`
+- Put both in your project folder
 
 ### Step 2 — Local development
 
 1. Install [VS Code](https://code.visualstudio.com) + the **Live Server** extension (by Ritwick Dey)
 2. Open your project folder in VS Code
 3. Right-click `index.html` → **Open with Live Server**
-4. Opens at `http://127.0.0.1:5500/index.html`
+4. Opens at `http://127.0.0.1:5500/index.html` — edits auto-refresh on save
 
-**Install as Mac app:** Chrome will show an install ⊕ icon in the address bar → click to install as a standalone app
+**Install as Mac desktop app:** In Chrome, look for the ⊕ install icon in the address bar and click it. Skies appears in your Applications folder and Dock.
 
-### Step 3 — Deploy to Vercel (free, HTTPS, works everywhere)
+### Step 3 — Deploy to Vercel (free, HTTPS, works on iPhone)
 
-1. Push your folder to a GitHub repo
-2. Go to [vercel.com](https://vercel.com) → Import project → connect your repo
-3. Click Deploy — you get a URL like `https://skies-weather.vercel.app`
+1. Push your project folder to a GitHub repository
+2. Go to [vercel.com](https://vercel.com) → New Project → import your GitHub repo
+3. Click Deploy — you get a permanent URL like `https://skies-weather.vercel.app`
 
-Any push to GitHub auto-redeploys in ~30 seconds.
+Every push to GitHub auto-redeploys in ~30 seconds.
 
-### Step 4 — iPhone home screen
+### Step 4 — Install on iPhone
 
 1. Open your Vercel URL in **Safari**
-2. Tap **Share → Add to Home Screen**
-3. Full-screen app, no browser bar, works offline ✓
+2. Tap the Share button → **Add to Home Screen** → Add
+3. Opens full-screen with no browser bar, works offline ✓
 
 ---
 
-## Making edits
+## Deploying updates without losing user data
 
-Edit `index.html` locally → save → Live Server auto-refreshes. When happy, push to GitHub and Vercel deploys automatically.
+Saved cities, unit preference, and theme are stored in `localStorage` under stable keys (`skies_places`, `skies_unit`, `skies_mode`). These are **never touched by a deploy**.
+
+The weather cache (`skies_cache_v1`) is separate and is safe to clear. To force all users to refetch fresh weather data after a deploy, rename the cache key in `app.js`:
+
+```js
+// In app.js, KEYS object at the top:
+cache: 'skies_cache_v2',  // bump this version to bust the cache
+```
+
+This only clears cached API responses — saved cities are completely unaffected.
+
+---
+
+## How swipe-to-delete works
+
+In the city list, swipe any city card **left** to reveal a red Delete button underneath. Tap Delete to remove it. Swipe right to dismiss. The default city (Charleston) cannot be deleted.
 
 ---
 
 ## Push notifications
 
-The app checks for rain every 15 minutes using the browser's Notification API. To enable:
 - Tap **Rain Alerts** in the Quick Actions card
 - Allow notifications when prompted
-- You'll get a notification if rain probability exceeds 60% in the next 3 hours for your default city (Charleston, IL)
-- Works in Chrome on desktop; Safari on iOS 16.4+ when installed as a home screen app
+- The app checks every 15 minutes and notifies if rain probability exceeds 60% in the next 3 hours for your default city
+- On desktop: works in Chrome
+- On iPhone: requires iOS 16.4+ and the app must be installed to the home screen (not just open in Safari)
 
 ---
 
 ## Weather alerts
 
-US weather alerts (NWS) load automatically for US cities. No setup needed — alerts appear as colored banners at the top of the screen when active. Colors indicate severity: red = extreme, orange = severe, yellow = moderate, blue = minor.
+NWS alerts (US only) load automatically alongside weather data. Active alerts appear as colored banners at the top of the screen — red for extreme, orange for severe, yellow for moderate, blue for minor. No configuration needed.
 
 ---
 
 ## Tips
 
-- Weather data caches for 10 minutes — tap Refresh to force a fresh fetch
-- City list and preferences (unit, dark/light mode) persist in localStorage
-- The app works fully offline after first load
-- On iOS, notifications only work when the app is installed to the home screen (Add to Home Screen)
+- Weather data caches for 10 minutes per city — use the Refresh button or pull down to force a fresh fetch
+- Tap either the °C or °F pill to switch which one is displayed large
+- The light/dark mode toggle is the sun/moon icon in the top-right corner of each city view, or in the city list settings
+- Moon phase is calculated locally with no API call
+- Historical context compares to the same date one year ago
+

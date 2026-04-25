@@ -271,8 +271,46 @@ body {
 .sri-n { font-size: 15px; font-weight: 500; color: var(--tx); }
 .sri-r { font-size: 12px; color: var(--tx3); margin-top: 1px; }
 .plist { flex: 1; overflow-y: auto; padding: 0 16px 20px; }
-.pc { border-radius: 20px; padding: 16px 18px; margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; min-height: 88px; display: flex; }
-.pc-bg { position: absolute; inset: 0; z-index: 0; }
+/* ── PLACE CARD — swipe-to-delete ── */
+.pc-wrap {
+  position: relative;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.pc-wrap.removing {
+  animation: collapseCard .28s ease forwards;
+}
+@keyframes collapseCard {
+  to { max-height: 0; opacity: 0; margin-bottom: 0; }
+}
+/* Red delete slab revealed behind the card */
+.pc-swipe-del {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 90px;
+  background: #ff3b30;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 600; color: #fff;
+  cursor: pointer;
+  border-radius: 0 20px 20px 0;
+  user-select: none;
+}
+/* The card itself slides left to reveal the delete slab */
+.pc {
+  border-radius: 20px;
+  padding: 16px 18px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 88px;
+  display: flex;
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+  /* ensure it sits above the delete slab */
+  z-index: 1;
+}
+.pc-bg { position: absolute; inset: 0; z-index: 0; border-radius: 20px; }
 .pc-body { position: relative; z-index: 1; width: 100%; display: flex; justify-content: space-between; align-items: flex-start; }
 .pc-l .pc-city { font-size: 20px; font-weight: 500; }
 .pc-l .pc-reg { font-size: 12px; opacity: .62; margin-top: 1px; }
@@ -280,8 +318,6 @@ body {
 .pc-r { text-align: right; }
 .pc-t { font-size: 44px; font-weight: 200; line-height: 1; }
 .pc-b { font-size: 12px; opacity: .55; margin-top: 3px; }
-.pc-del { position: absolute; top: 10px; right: 10px; z-index: 5; background: rgba(255,59,48,.9); border-radius: 50%; width: 24px; height: 24px; display: none; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; color: #fff; }
-.pc.editing .pc-del { display: flex; }
 
 /* ── UTILS ── */
 .spin { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--card-b); border-top-color: var(--tx2); animation: spin .7s linear infinite; display: inline-block; }
@@ -354,3 +390,6 @@ body {
 .dg-val { font-size:18px; font-weight:300; color:var(--tx); margin-top:2px; }
 .dg-lbl { font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:.06em; margin-top:1px; }
 
+
+/* Edit button hidden — swipe-to-delete replaced it */
+.edbtn { visibility: hidden; pointer-events: none; }
